@@ -5,16 +5,24 @@ A full-stack e-commerce platform built with **Spring Boot**, **MySQL**, and **va
 <img width="1917" height="902" alt="image" src="https://github.com/user-attachments/assets/118f5329-dd3d-4fc2-9c19-73a2dfd43a4e" /> 
 <img width="1916" height="908" alt="image" src="https://github.com/user-attachments/assets/04f40272-7100-4e74-b7de-6430e10b835b" />
 <img width="1901" height="912" alt="image" src="https://github.com/user-attachments/assets/44b107b3-eacd-4f07-b724-5df224e2f4bd" />
+
 Customer: 
+
 <img width="1892" height="906" alt="image" src="https://github.com/user-attachments/assets/6a9818ca-402e-41a0-9ca6-453552ea4e4a" />
 <img width="1897" height="903" alt="image" src="https://github.com/user-attachments/assets/08e02f95-c025-48e9-8a44-39765ab423c9" />
+
 Admin: 
+
 <img width="1917" height="902" alt="image" src="https://github.com/user-attachments/assets/9f9dd9b9-89b8-4a84-99b5-a2b8e941fd34" />
 <img width="1892" height="901" alt="image" src="https://github.com/user-attachments/assets/8412b633-f5a5-4a8e-88e3-4f8ce8c135bf" />
+
 Seller: 
+
 <img width="1912" height="902" alt="image" src="https://github.com/user-attachments/assets/9ed4a887-fa14-4d12-8729-d9080584f9d9" />
 <img width="1906" height="881" alt="image" src="https://github.com/user-attachments/assets/0fcff2e1-d0f9-41f1-8a04-3022c05489d5" />
+
 Email: 
+
 <img width="718" height="1382" alt="image" src="https://github.com/user-attachments/assets/b4f95f4e-706f-4eb2-83bd-9c94a929d4ca" />
 
 ---
