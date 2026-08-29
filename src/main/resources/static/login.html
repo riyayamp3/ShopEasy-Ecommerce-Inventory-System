@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login — ShopEasy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h2>ShopEasy</h2>
+            <p id="auth-subtitle">Welcome back! Sign in to continue</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login', this)">Login</button>
+            <button class="auth-tab"        onclick="switchTab('register', this)">Register</button>
+        </div>
+
+        <!-- ── LOGIN ── -->
+        <div id="login-form">
+            <div class="form-group">
+                <label>Email or Username</label>
+                <input type="text" id="login-email" placeholder="email@example.com or your username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            <button class="auth-submit" onclick="handleLogin()">Sign In</button>
+            <div id="login-msg" class="result-box" style="display:none"></div>
+            <p class="auth-msg" style="margin-top:14px;font-size:12px">
+                Customer: alice@example.com &nbsp;|&nbsp; Admin: admin1234@gmail.com &nbsp;|&nbsp; Sellers: use your username
+            </p>
+        </div>
+
+        <!-- ── REGISTER ── -->
+        <div id="register-form" style="display:none">
+            <!-- Role picker -->
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+                <div id="role-customer" class="role-pill active" onclick="selectRole('customer')">Customer</div>
+                <div id="role-seller"   class="role-pill"        onclick="selectRole('seller')">Seller</div>
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="reg-username" placeholder="yourname">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reg-password" placeholder="min 6 characters">
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="reg-phone" placeholder="+91 9876543210">
+            </div>
+
+            <!-- Seller-only fields -->
+            <div id="seller-fields" style="display:none">
+                <div style="background:#fefce8;border-radius:10px;padding:16px;margin-bottom:16px;border:1px solid rgba(245,197,24,0.3)">
+                    <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;letter-spacing:0.5px;text-transform:uppercase">Store Information</div>
+
+                    <div class="form-group">
+                        <label>Business Name <span style="color:var(--danger)">*</span></label>
+                        <input type="text" id="reg-business" placeholder="e.g. TechZone Electronics">
+                    </div>
+                    <div class="form-group">
+                        <label>Business Category <span style="color:var(--danger)">*</span></label>
+                        <select id="reg-category">
+                            <option value="">Select your main category</option>
+                            <option>Electronics</option>
+                            <option>Footwear</option>
+                            <option>Kitchen</option>
+                            <option>Sports</option>
+                            <option>Books</option>
+                            <option>Home Decor</option>
+                            <option>Clothing</option>
+                            <option>Pet Supplies</option>
+                            <option>Auto</option>
+                            <option>Toys</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Store Description <span style="color:var(--danger)">*</span></label>
+                        <textarea id="reg-description" rows="3" placeholder="Tell customers what your store sells and what makes it special..." style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;outline:none;margin:0"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Location <span style="color:var(--danger)">*</span></label>
+                        <input type="text" id="reg-location" placeholder="e.g. Mumbai, Maharashtra">
+                    </div>
+                    <div class="form-group">
+                        <label>GST Number</label>
+                        <input type="text" id="reg-gst" placeholder="22AAAAA0000A1Z5 (optional)">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account Number</label>
+                        <input type="text" id="reg-bank" placeholder="For payouts (optional)">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label>Business Address</label>
+                        <input type="text" id="reg-address" placeholder="Full address (optional)">
+                    </div>
+                </div>
+            </div>
+
+            <button class="auth-submit" onclick="handleRegister()">Create Account</button>
+            <div id="reg-msg" class="result-box" style="display:none"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .role-pill {
+      flex: 1; padding: 10px; text-align: center;
+      border: 2px solid #e2e8f0; border-radius: 10px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      color: var(--muted); transition: all 0.2s;
+    }
+    .role-pill.active { border-color: var(--accent); color: var(--accent); background: #eef3fb; }
+</style>
+
+<script>
+    let selectedRole = 'customer';
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
+      document.getElementById(`role-${role}`).classList.add('active');
+      document.getElementById('seller-fields').style.display = role === 'seller' ? 'block' : 'none';
+    }
+
+    function switchTab(tab, el) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('login-form').style.display    = tab === 'login'    ? 'block' : 'none';
+      document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('auth-subtitle').textContent   =
+        tab === 'login' ? 'Welcome back! Sign in to continue' : 'Create your ShopEasy account';
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const msg   = document.getElementById('login-msg');
+
+      if (!email) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Please enter your email'; return;
+      }
+
+      try {
+        const res  = await fetch('http://localhost:8080/api/users/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: document.getElementById('login-password').value })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('user', JSON.stringify(data));
+          msg.style.display = 'block'; msg.className = 'result-box success';
+          msg.textContent = `Welcome back, ${data.username}! Redirecting...`;
+
+          // Sync any localStorage cart items to DB
+          if (data.role === 'customer') {
+            const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (localCart.length > 0) {
+              try {
+                await fetch('http://localhost:8080/api/cart/sync', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId: data.userId, items: localCart })
+                });
+                localStorage.removeItem('cart');
+              } catch (_) {}
+            }
+          }
+
+          setTimeout(() => {
+            if      (data.role === 'admin')  window.location.href = 'admin.html';
+            else if (data.role === 'seller') window.location.href = 'seller.html';
+            else                             window.location.href = 'index.html';
+          }, 900);
+        } else {
+          msg.style.display = 'block'; msg.className = 'result-box error';
+          msg.textContent = data.error;
+        }
+      } catch(e) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Could not connect to server.';
+      }
+    }
+
+    async function handleRegister() {
+      const msg = document.getElementById('reg-msg');
+      const username = document.getElementById('reg-username').value.trim();
+      const email    = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+
+      if (!username || !email || !password) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Please fill all required fields'; return;
+      }
+      if (selectedRole === 'seller' && !document.getElementById('reg-business').value.trim()) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Business name is required for sellers'; return;
+      }
+      if (selectedRole === 'seller' && !document.getElementById('reg-category').value) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Please select a business category'; return;
+      }
+      if (selectedRole === 'seller' && !document.getElementById('reg-description').value.trim()) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Please add a store description'; return;
+      }
+      if (selectedRole === 'seller' && !document.getElementById('reg-location').value.trim()) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Please enter your business location'; return;
+      }
+
+      try {
+        const body = {
+          username, email, password, role: selectedRole,
+          phone:        document.getElementById('reg-phone').value,
+          businessName: document.getElementById('reg-business')?.value || '',
+          category:     document.getElementById('reg-category')?.value || '',
+          description:  document.getElementById('reg-description')?.value || '',
+          location:     document.getElementById('reg-location')?.value || '',
+          gst:          document.getElementById('reg-gst')?.value      || '',
+          bankAccount:  document.getElementById('reg-bank')?.value     || '',
+          address:      document.getElementById('reg-address')?.value  || '',
+        };
+
+        const res  = await fetch('http://localhost:8080/api/users/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          msg.style.display = 'block'; msg.className = 'result-box success';
+          msg.innerHTML = selectedRole === 'seller'
+            ? `Seller account created! Your application is <strong>pending admin approval</strong>. You will be able to list products once approved.`
+            : `Account created! <a href="#" onclick="switchTab('login', document.querySelectorAll('.auth-tab')[0])" style="color:var(--success);font-weight:700">Sign in now</a>`;
+        } else {
+          msg.style.display = 'block'; msg.className = 'result-box error';
+          msg.textContent =  data.error;
+        }
+      } catch(e) {
+        msg.style.display = 'block'; msg.className = 'result-box error';
+        msg.textContent = 'Could not connect to server.';
+      }
+    }
+</script>
+</body>
+</html>

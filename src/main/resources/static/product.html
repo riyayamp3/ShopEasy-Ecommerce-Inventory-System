@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product — ShopEasy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="announce-bar">
+    Free shipping on orders above Rs.499 &nbsp;|&nbsp; Use code <strong>EASY10</strong> for 10% off
+</div>
+
+<nav>
+    <a class="nav-logo" href="index.html">Shop<span>Easy</span></a>
+    <div class="nav-search" style="max-width:360px">
+        <input type="text" placeholder="Search products..." onclick="window.location.href='index.html'">
+        <button class="search-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="nav-right">
+        <div id="nav-user-area"></div>
+        <a href="cart.html" class="cart-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Cart <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </div>
+</nav>
+
+<div class="container-wide" style="padding-top:32px;padding-bottom:60px">
+    <!-- Breadcrumb -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px">
+        <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none">Home</a>
+        <span style="color:var(--muted);font-size:13px">/</span>
+        <span id="breadcrumb-cat" style="font-size:13px;color:var(--muted)">Products</span>
+        <span style="color:var(--muted);font-size:13px">/</span>
+        <span id="breadcrumb-name" style="font-size:13px;color:var(--text)">Loading...</span>
+    </div>
+
+    <div id="product-detail"></div>
+
+    <!-- Sellers -->
+    <div class="card" style="margin-top:32px">
+        <h3>Available from Sellers</h3>
+        <div id="sellers-list"></div>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-bottom container-wide">
+        <span>2024 ShopEasy. All rights reserved.</span>
+        <a href="index.html" style="color:#94a3b8;text-decoration:none">Continue Shopping</a>
+    </div>
+</footer>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    let currentProduct = null;
+
+    const PRODUCT_IMAGES = {
+    1:'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80',2:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80',3:'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&q=80',4:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80',5:'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80',6:'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&q=80',7:'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&q=80',8:'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&q=80',9:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',10:'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&q=80',11:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=80',12:'https://images.unsplash.com/photo-1449505278894-297fdb3edbc1?w=600&q=80',13:'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&q=80',14:'https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&q=80',15:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',16:'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=600&q=80',17:'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=80',18:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',19:'https://images.unsplash.com/photo-1617083934551-ac1f3b4b7b4e?w=600&q=80',20:'https://images.unsplash.com/photo-1617083934551-ac1f3b4b7b4e?w=600&q=80',21:'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',22:'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80',23:'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80',24:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80',25:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',26:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',27:'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=80',28:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',29:'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=600&q=80',30:'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&q=80',31:'https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=600&q=80'
+};
+
+    function renderNav() {
+        const area = document.getElementById('nav-user-area');
+        if (user) {
+            area.innerHTML = `
+                <div class="nav-user-menu">
+                    <button class="nav-user-btn" onclick="toggleUserMenu()">
+                        <div class="nav-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                        <span>${user.username}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="profile.html" class="dropdown-item">My Profile</a>
+                        <a href="orders.html" class="dropdown-item">My Orders</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-logout" onclick="logout()">Sign Out</a>
+                    </div>
+                </div>`;
+        } else {
+            area.innerHTML = `<a href="login.html" class="nav-login-link">Sign In</a>`;
+        }
+    }
+
+    function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('open'); }
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('user-dropdown');
+        if (menu && !e.target.closest('.nav-user-menu')) menu.classList.remove('open');
+    });
+    function logout() { localStorage.removeItem('user'); window.location.href = 'landing.html'; }
+
+    function updateCartCount() {
+        document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.quantity, 0);
+    }
+
+    function addToCartFromDetail() {
+        if (!currentProduct) return;
+        const qty = parseInt(document.getElementById('detail-qty').textContent) || 1;
+        const existing = cart.find(i => i.productId === currentProduct.productId);
+        if (existing) existing.quantity += qty;
+        else cart.push({ ...currentProduct, quantity: qty, image: PRODUCT_IMAGES[currentProduct.productId] });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        const btn = document.getElementById('add-cart-detail-btn');
+        btn.textContent = 'Added to Cart';
+        btn.style.background = '#16a34a';
+        setTimeout(() => { btn.textContent = 'Add to Cart'; btn.style.background = ''; }, 1500);
+    }
+
+    function changeDetailQty(delta) {
+        const el = document.getElementById('detail-qty');
+        const val = Math.max(1, parseInt(el.textContent) + delta);
+        el.textContent = val;
+        loadSellers(val);
+    }
+
+    async function loadProduct() {
+        try {
+            const res = await fetch(`http://localhost:8080/api/products/${productId}`);
+            currentProduct = await res.json();
+            document.title = `${currentProduct.productName} — ShopEasy`;
+            document.getElementById('breadcrumb-cat').textContent = currentProduct.category;
+            document.getElementById('breadcrumb-name').textContent = currentProduct.productName;
+
+            const img = PRODUCT_IMAGES[currentProduct.productId] || '';
+            const mrp = Math.round(currentProduct.basePrice * 1.2);
+
+            document.getElementById('product-detail').innerHTML = `
+                <div class="detail-grid">
+                    <div>
+                        <img class="detail-img" src="${img}" alt="${currentProduct.productName}"
+                             onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'">
+                    </div>
+                    <div>
+                        <div class="detail-cat">${currentProduct.category}</div>
+                        <div class="detail-name">${currentProduct.productName}</div>
+                        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:20px">
+                            <div class="detail-price">Rs.${currentProduct.basePrice.toLocaleString()}</div>
+                            <div style="font-size:16px;color:var(--muted);text-decoration:line-through">Rs.${mrp.toLocaleString()}</div>
+                            <div style="font-size:14px;font-weight:700;color:var(--success)">20% off</div>
+                        </div>
+                        <div class="detail-desc">${currentProduct.description || 'No description available.'}</div>
+
+                        <div class="qty-control">
+                            <span style="font-size:14px;font-weight:600;color:var(--text)">Quantity:</span>
+                            <button class="qty-btn" onclick="changeDetailQty(-1)">-</button>
+                            <span class="qty-num" id="detail-qty">1</span>
+                            <button class="qty-btn" onclick="changeDetailQty(1)">+</button>
+                        </div>
+
+                        <button id="add-cart-detail-btn" class="buy-btn" onclick="addToCartFromDetail()">Add to Cart</button>
+                        <button onclick="buyNow()" style="width:100%;padding:14px;border-radius:10px;font-size:16px;font-weight:700;background:var(--success)">Buy Now</button>
+
+                        <div id="order-result" class="result-box" style="display:none;margin-top:16px"></div>
+
+                        <div style="display:flex;gap:24px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0">
+                            <div style="text-align:center;font-size:12px;color:var(--muted)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                Free Delivery
+                            </div>
+                            <div style="text-align:center;font-size:12px;color:var(--muted)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                                7-Day Returns
+                            </div>
+                            <div style="text-align:center;font-size:12px;color:var(--muted)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Secure Payment
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        } catch (e) {
+            document.getElementById('product-detail').innerHTML = '<p style="color:var(--muted)">Could not load product.</p>';
+        }
+    }
+
+    async function loadSellers(qty = 1) {
+        try {
+            const res = await fetch(`http://localhost:8080/api/inventory/available?productId=${productId}&quantity=${qty}`);
+            const sellers = await res.json();
+            const list = document.getElementById('sellers-list');
+            if (sellers.length === 0) {
+                list.innerHTML = '<p style="color:var(--muted)">No sellers have enough stock for this quantity.</p>';
+                return;
+            }
+            list.innerHTML = sellers.map(s => `
+                <div class="seller-card">
+                    <div>
+                        <div class="seller-name">Seller #${s.sellerId}</div>
+                        <div class="seller-stock">${s.currentQuantity} units in stock</div>
+                        <a href="store.html?id=${s.sellerId}" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;margin-top:4px;display:inline-block">View Store</a>
+                    </div>
+                    <div class="seller-price">Rs.${Number(s.price).toLocaleString('en-IN')}</div>
+                </div>`).join('');
+        } catch (e) {
+            document.getElementById('sellers-list').innerHTML = '<p style="color:var(--muted)">Could not load seller info.</p>';
+        }
+    }
+
+    async function buyNow() {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const quantity = parseInt(document.getElementById('detail-qty').textContent) || 1;
+        const resultBox = document.getElementById('order-result');
+        try {
+            const res = await fetch('http://localhost:8080/api/orders/place', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customerId: user.userId, productId: parseInt(productId), quantity })
+            });
+            const data = await res.json();
+            resultBox.style.display = 'block';
+            if (res.ok) {
+                resultBox.className = 'result-box success';
+                resultBox.innerHTML = `Order placed! Order ID: <strong>#${data.orderId}</strong> &nbsp; <a href="orders.html" style="color:var(--success);font-weight:700">View Orders</a>`;
+                loadSellers(quantity);
+            } else {
+                resultBox.className = 'result-box error';
+                resultBox.textContent = data.error || 'Failed to place order.';
+            }
+        } catch (e) {
+            resultBox.style.display = 'block';
+            resultBox.className = 'result-box error';
+            resultBox.textContent = 'Could not connect to server.';
+        }
+    }
+
+    renderNav();
+    updateCartCount();
+    loadProduct();
+    loadSellers();
+</script>
+</body>
+</html>
+

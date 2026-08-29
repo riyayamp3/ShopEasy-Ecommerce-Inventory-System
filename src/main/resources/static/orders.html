@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders — ShopEasy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="announce-bar">
+    Free shipping on orders above Rs.499 &nbsp;|&nbsp; Use code <strong>EASY10</strong> for 10% off
+</div>
+
+<nav>
+    <a class="nav-logo" href="index.html">Shop<span>Easy</span></a>
+    <div class="nav-search" style="max-width:360px">
+        <input type="text" placeholder="Search products..." onclick="window.location.href='index.html'">
+        <button class="search-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="nav-right">
+        <div id="nav-user-area"></div>
+        <a href="cart.html" class="cart-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Cart <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </div>
+</nav>
+
+<div class="container-wide" style="padding-top:40px;padding-bottom:60px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px">
+        <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none">Home</a>
+        <span style="color:var(--muted);font-size:13px">/</span>
+        <span style="font-size:13px;color:var(--text)">My Orders</span>
+    </div>
+
+    <h2 style="margin-bottom:24px">My Orders</h2>
+    <div id="orders-list"></div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-bottom container-wide">
+        <span>2024 ShopEasy. All rights reserved.</span>
+        <a href="index.html" style="color:#94a3b8;text-decoration:none">Continue Shopping</a>
+    </div>
+</footer>
+
+<script>
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    function renderNav() {
+        const area = document.getElementById('nav-user-area');
+        if (user) {
+            area.innerHTML = `
+                <div class="nav-user-menu">
+                    <button class="nav-user-btn" onclick="toggleUserMenu()">
+                        <div class="nav-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                        <span>${user.username}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="profile.html" class="dropdown-item">My Profile</a>
+                        <a href="orders.html" class="dropdown-item">My Orders</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-logout" onclick="logout()">Sign Out</a>
+                    </div>
+                </div>`;
+        } else {
+            area.innerHTML = `<a href="login.html" class="nav-login-link">Sign In</a>`;
+        }
+    }
+
+    function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('open'); }
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('user-dropdown');
+        if (menu && !e.target.closest('.nav-user-menu')) menu.classList.remove('open');
+    });
+    function logout() { localStorage.removeItem('user'); window.location.href = 'landing.html'; }
+
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.quantity, 0);
+    }
+
+    const PRODUCT_IMAGES = {
+    1:'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=120&q=80',2:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&q=80',3:'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=120&q=80',4:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=120&q=80',5:'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=120&q=80',6:'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=120&q=80',7:'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=120&q=80',8:'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=120&q=80',9:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&q=80',10:'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=120&q=80',11:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=120&q=80',12:'https://images.unsplash.com/photo-1449505278894-297fdb3edbc1?w=120&q=80',13:'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=120&q=80',14:'https://images.unsplash.com/photo-1585515320310-259814833e62?w=120&q=80',15:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=120&q=80',16:'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=120&q=80',17:'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=120&q=80',18:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=120&q=80',19:'https://images.unsplash.com/photo-1617083934551-ac1f3b4b7b4e?w=120&q=80',20:'https://images.unsplash.com/photo-1617083934551-ac1f3b4b7b4e?w=120&q=80',21:'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=120&q=80',22:'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=120&q=80',23:'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=120&q=80',24:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=120&q=80',25:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=120&q=80',26:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=120&q=80',27:'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=120&q=80',28:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=120&q=80',29:'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=120&q=80',30:'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=120&q=80',31:'https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=120&q=80'
+};
+
+    async function loadOrders() {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const list = document.getElementById('orders-list');
+        list.innerHTML = '<p style="color:var(--muted)">Loading your orders...</p>';
+        try {
+            const res = await fetch(`http://localhost:8080/api/orders/customer/${user.userId}/detailed`);
+            const orders = await res.json();
+
+            if (orders.length === 0) {
+                list.innerHTML = `
+                    <div class="card" style="text-align:center;padding:80px 40px">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 20px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <h3 style="margin-bottom:8px">No orders yet</h3>
+                        <p style="color:var(--muted);margin-bottom:24px">Start shopping to see your orders here.</p>
+                        <a href="index.html" style="display:inline-block;padding:12px 28px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:700">Browse Products</a>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = orders.reverse().map(o => {
+                const img = PRODUCT_IMAGES[o.productId] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&q=80';
+                const statusColors = { processing:'#92400e', shipped:'#1e40af', delivered:'#166534', cancelled:'#991b1b' };
+                const statusBg    = { processing:'#fef3c7', shipped:'#dbeafe', delivered:'#dcfce7', cancelled:'#fee2e2' };
+                const st = o.status || 'processing';
+                return `
+                <div class="order-card">
+                    <div style="display:flex;gap:16px;align-items:flex-start">
+                        <img src="${img}" alt="${o.productName||''}"
+                             style="width:80px;height:80px;object-fit:cover;border-radius:10px;flex-shrink:0;background:#f1f5f9;cursor:pointer"
+                             onclick="window.location.href='product.html?id=${o.productId}'"
+                             onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&q=80'">
+                        <div style="flex:1;min-width:0">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                                <div>
+                                    <div style="font-size:15px;font-weight:700;color:var(--primary);cursor:pointer" onclick="window.location.href='product.html?id=${o.productId}'">${o.productName||'Product #'+o.productId}</div>
+                                    <div style="font-size:12px;color:var(--muted);margin-top:2px">${o.productCategory||''}</div>
+                                </div>
+                                <span style="background:${statusBg[st]||'#fef3c7'};color:${statusColors[st]||'#92400e'};padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;margin-left:12px">${st}</span>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Order ID</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px">#${o.orderId}</div>
+                                </div>
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Quantity</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px">${o.quantity} unit${o.quantity>1?'s':''}</div>
+                                </div>
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Total Paid</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--primary);margin-top:2px">Rs.${Number(o.totalAmount||0).toLocaleString('en-IN')}</div>
+                                </div>
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Price/Unit</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px">Rs.${Number(o.priceAtPurchase||0).toLocaleString('en-IN')}</div>
+                                </div>
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Seller</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--accent);margin-top:2px;cursor:pointer" onclick="window.location.href='store.html?id=${o.sellerId}'">${o.sellerName||'Seller #'+o.sellerId}</div>
+                                </div>
+                                <div style="background:#f8faff;border-radius:8px;padding:8px 10px">
+                                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Payment</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--success);margin-top:2px">${o.paymentStatus||'—'}</div>
+                                </div>
+                            </div>
+                            <div style="font-size:12px;color:#94a3b8">Ordered on ${o.orderDate ? new Date(o.orderDate).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+                        </div>
+                    </div>
+                    ${o.status !== 'cancelled' && o.status !== 'delivered' ? `
+                        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9;display:flex;gap:10px">
+                            <button onclick="cancelOrder(${o.orderId}, this)" style="width:auto;background:var(--danger);padding:8px 16px;font-size:13px">Cancel Order</button>
+                            <div id="cancel-result-${o.orderId}" class="result-box" style="display:none;margin:0;flex:1"></div>
+                        </div>` : ''}
+                </div>`;
+            }).join('');
+        } catch (e) {
+            list.innerHTML = '<p style="color:var(--muted)">Could not load orders. Make sure the server is running.</p>';
+        }
+    }
+
+    async function cancelOrder(orderId, btn) {
+        const resultBox = document.getElementById(`cancel-result-${orderId}`);
+        btn.disabled = true; btn.textContent = 'Cancelling...';
+        try {
+            const res = await fetch(`http://localhost:8080/api/orders/${orderId}/cancel`, { method: 'POST' });
+            const text = await res.text();
+            resultBox.style.display = 'block';
+            if (res.ok) {
+                resultBox.className = 'result-box success';
+                resultBox.textContent = text;
+                setTimeout(loadOrders, 1000);
+            } else {
+                resultBox.className = 'result-box error';
+                resultBox.textContent = text;
+                btn.disabled = false; btn.textContent = 'Cancel Order';
+            }
+        } catch (e) {
+            resultBox.style.display = 'block';
+            resultBox.className = 'result-box error';
+            resultBox.textContent = 'Could not connect to server.';
+            btn.disabled = false;
+        }
+    }
+
+    renderNav();
+    updateCartCount();
+    loadOrders();
+</script>
+</body>
+</html>
+

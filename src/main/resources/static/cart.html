@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart — ShopEasy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="announce-bar">
+    Free shipping on orders above Rs.499 &nbsp;|&nbsp; Use code <strong>EASY10</strong> for 10% off
+</div>
+
+<nav>
+    <a class="nav-logo" href="index.html">Shop<span>Easy</span></a>
+    <div class="nav-search" style="max-width:360px">
+        <input type="text" placeholder="Search products..." onclick="window.location.href='index.html'">
+        <button class="search-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+    <div class="nav-right">
+        <div id="nav-user-area"></div>
+        <a href="cart.html" class="cart-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Cart <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </div>
+</nav>
+
+<div class="container-wide" style="padding-top:40px;padding-bottom:60px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px">
+        <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none">Home</a>
+        <span style="color:var(--muted);font-size:13px">/</span>
+        <span style="font-size:13px;color:var(--text)">Cart</span>
+    </div>
+
+    <h2 style="margin-bottom:24px">Your Cart</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start">
+        <div id="cart-items"></div>
+
+        <div class="card" id="summary" style="display:none;position:sticky;top:80px">
+            <h3 style="margin-bottom:20px">Order Summary</h3>
+            <div id="summary-lines"></div>
+            <div style="border-top:2px solid #e2e8f0;margin:16px 0;padding-top:16px">
+                <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700">
+                    <span>Total</span>
+                    <span id="grand-total" style="color:var(--primary)"></span>
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px">Inclusive of all taxes</div>
+            </div>
+            <button class="checkout-btn" onclick="checkoutAll()">Place Order</button>
+            <div id="checkout-result" class="result-box" style="display:none;margin-top:12px"></div>
+            <div style="display:flex;gap:16px;justify-content:center;margin-top:16px">
+                <div style="text-align:center;font-size:11px;color:var(--muted)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Secure
+                </div>
+                <div style="text-align:center;font-size:11px;color:var(--muted)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    Free Delivery
+                </div>
+                <div style="text-align:center;font-size:11px;color:var(--muted)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 4px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                    Easy Returns
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-bottom container-wide">
+        <span>2024 ShopEasy. All rights reserved.</span>
+        <a href="index.html" style="color:#94a3b8;text-decoration:none">Continue Shopping</a>
+    </div>
+</footer>
+
+<script>
+    let cart = [];
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    function renderNav() {
+        const area = document.getElementById('nav-user-area');
+        if (user) {
+            area.innerHTML = `
+                <div class="nav-user-menu">
+                    <button class="nav-user-btn" onclick="toggleUserMenu()">
+                        <div class="nav-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                        <span>${user.username}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="profile.html" class="dropdown-item">My Profile</a>
+                        <a href="orders.html" class="dropdown-item">My Orders</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-logout" onclick="logout()">Sign Out</a>
+                    </div>
+                </div>`;
+        } else {
+            area.innerHTML = `<a href="login.html" class="nav-login-link">Sign In</a>`;
+        }
+    }
+
+    function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('open'); }
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('user-dropdown');
+        if (menu && !e.target.closest('.nav-user-menu')) menu.classList.remove('open');
+    });
+    function logout() { localStorage.removeItem('user'); window.location.href = 'landing.html'; }
+
+    function updateCartCount() {
+        document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.quantity, 0);
+    }
+
+    async function loadCart() {
+        if (user) {
+            try {
+                const res = await fetch(`http://localhost:8080/api/cart/${user.userId}`);
+                cart = await res.json();
+                // Normalize field names from DB (cartItem has productName, basePrice)
+                cart = cart.map(i => ({
+                    productId: i.productId,
+                    productName: i.productName,
+                    category: i.category,
+                    basePrice: Number(i.basePrice),
+                    quantity: i.quantity,
+                    image: i.imageUrl || ''
+                }));
+            } catch { cart = []; }
+        } else {
+            cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        }
+        renderCart();
+    }
+
+    async function removeItem(productId) {
+        if (user) {
+            await fetch(`http://localhost:8080/api/cart/${user.userId}/${productId}`, { method: 'DELETE' });
+        }
+        cart = cart.filter(i => i.productId !== productId);
+        if (!user) localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    async function changeQty(productId, delta) {
+        const item = cart.find(i => i.productId === productId);
+        if (!item) return;
+        const newQty = item.quantity + delta;
+        if (newQty <= 0) { removeItem(productId); return; }
+        item.quantity = newQty;
+        if (user) {
+            await fetch('http://localhost:8080/api/cart/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.userId, productId, quantity: newQty })
+            });
+        } else {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+        renderCart();
+    }
+
+    function renderCart() {
+        updateCartCount();
+        const container = document.getElementById('cart-items');
+        const summary = document.getElementById('summary');
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center;padding:80px 40px">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 20px;display:block"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <h3 style="margin-bottom:8px">Your cart is empty</h3>
+                    <p style="color:var(--muted);margin-bottom:24px">Looks like you haven't added anything yet.</p>
+                    <a href="index.html" style="display:inline-block;padding:12px 28px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:700">Browse Products</a>
+                </div>`;
+            summary.style.display = 'none';
+            return;
+        }
+
+        summary.style.display = 'block';
+        let total = 0;
+
+        container.innerHTML = cart.map(item => {
+            const subtotal = item.basePrice * item.quantity;
+            total += subtotal;
+            return `
+                <div class="card" style="margin-bottom:16px;display:flex;gap:16px;align-items:center">
+                    <img src="${item.image || item.imageUrl || ''}" alt="${item.productName}"
+                         style="width:100px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;background:#e2e8f0"
+                         onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:4px">${item.category || ''}</div>
+                        <div style="font-size:16px;font-weight:600;margin-bottom:6px">${item.productName}</div>
+                        <div style="font-size:18px;font-weight:700;color:var(--primary)">Rs.${item.basePrice.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+                        <button class="qty-btn" onclick="changeQty(${item.productId}, -1)">-</button>
+                        <span class="qty-num">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeQty(${item.productId}, 1)">+</button>
+                    </div>
+                    <div style="min-width:100px;text-align:right;flex-shrink:0">
+                        <div style="font-size:16px;font-weight:700;color:var(--primary)">Rs.${subtotal.toLocaleString('en-IN')}</div>
+                        <button onclick="removeItem(${item.productId})"
+                                style="background:none;color:var(--danger);border:none;padding:4px;font-size:13px;cursor:pointer;margin-top:4px;width:auto">
+                            Remove
+                        </button>
+                    </div>
+                </div>`;
+        }).join('');
+
+        document.getElementById('grand-total').textContent = 'Rs.' + total.toLocaleString('en-IN');
+        document.getElementById('summary-lines').innerHTML = cart.map(i =>
+            `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:var(--muted)">
+                <span>${i.productName} x ${i.quantity}</span>
+                <span>Rs.${(i.basePrice * i.quantity).toLocaleString('en-IN')}</span>
+            </div>`
+        ).join('');
+    }
+
+    async function checkoutAll() {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const resultBox = document.getElementById('checkout-result');
+        const btn = document.querySelector('.checkout-btn');
+        btn.disabled = true; btn.textContent = 'Placing orders...';
+
+        let successCount = 0, errors = [];
+        for (const item of cart) {
+            try {
+                const res = await fetch('http://localhost:8080/api/orders/place', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customerId: user.userId, productId: item.productId, quantity: item.quantity })
+                });
+                const data = await res.json();
+                if (res.ok) successCount++;
+                else errors.push(`${item.productName}: ${data.error}`);
+            } catch (e) {
+                errors.push(`${item.productName}: Connection error`);
+            }
+        }
+
+        if (successCount > 0) {
+            await fetch(`http://localhost:8080/api/cart/${user.userId}`, { method: 'DELETE' });
+            cart = [];
+        }
+
+        resultBox.style.display = 'block';
+        if (errors.length === 0) {
+            resultBox.className = 'result-box success';
+            resultBox.innerHTML = `${successCount} order(s) placed! <a href="orders.html" style="color:var(--success);font-weight:700">View Orders</a>`;
+            renderCart();
+        } else {
+            resultBox.className = 'result-box error';
+            resultBox.innerHTML = `${successCount} succeeded, ${errors.length} failed:<br>${errors.join('<br>')}`;
+        }
+        btn.disabled = false; btn.textContent = 'Place Order';
+    }
+
+    renderNav();
+    loadCart();
+</script>
+</body>
+</html>
